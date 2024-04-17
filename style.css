@@ -1,0 +1,26 @@
+.form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  row-gap: 20px;
+}
+.form__input {
+  background: none;
+  padding: 10px;
+  font-size: 20px;
+  border: 1px solid rgba(0,0,0,.5);
+}
+.form__submit {
+  background: rgb(8, 150, 8);
+  padding: 10px;
+  font-size: 20px;
+  border: none;
+  color: #fff;
+}
+.form__submit:active{
+  background: rgb(0, 109, 0);
+}
+.hidden{
+  display: none;
+}

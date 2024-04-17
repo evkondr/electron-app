@@ -1,0 +1,22 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.ts",
+  "scripts": {
+    "start": "concurrently \"tsc --watch app.ts main.ts\" \"electron app.js\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "electron": "30.0.0",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "concurrently": "^8.2.2"
+  }
+}
