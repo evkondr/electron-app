@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.ts",
   "scripts": {
-    "start": "concurrently \"tsc --watch app.ts main.ts\" \"electron app.js\""
+    "compile": "tsc --watch",
+    "start": "concurrently \"npm run compile\" \"electron ./build/app.js\""
   },
   "author": "",
   "license": "ISC",
