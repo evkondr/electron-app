@@ -1,3 +1,8 @@
+.container {
+  width: 500px;
+  height: 500px;
+  overflow: scroll;
+}
 .form{
   display: flex;
   flex-direction: column;
@@ -22,5 +27,23 @@
   background: rgb(0, 109, 0);
 }
 .hidden{
-  display: none;
+  display: none!important;
+}
+.controller{
+  padding-top: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 10px;
+}
+.controller__btn {
+  background: rgb(8, 150, 8);
+  padding: 10px;
+  font-size: 20px;
+  border: none;
+  color: #fff;
+}
+.controller__btn:active{
+  background: rgb(0, 109, 0);
 }

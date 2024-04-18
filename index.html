@@ -8,12 +8,17 @@
 </head>
 <body>
   <div class="container">
-    <form action="" name="login-form" class="form">
+    <form action="" name="login-form" class="form hidden">
       <h2>Вход</h2>
       <input type="text" name="login" placeholder="Пользователь" class="form__input">
       <input type="password" name="password" placeholder="Пароль" class="form__input">
       <button type="submit" class="form__submit">Войти</button>
     </form>
+    <div class="controller">
+      <button id="change-login" class="controller__btn">Сменить логин</button>
+      <button id="fetch-data" class="controller__btn">Загрузить данные</button>
+    </div>
+    <div class="error-box"></div>
   </div>
   <div class="message">
     
