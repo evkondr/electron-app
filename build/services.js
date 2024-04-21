@@ -30,6 +30,7 @@ class APISerives {
                     Authorization: `Bearer ${token}`
                 }
             });
+            console.log(result.data);
             return result.data;
         });
     }

@@ -1,3 +1,6 @@
+button {
+  cursor: pointer;
+}
 .container {
   width: 500px;
   height: 500px;
@@ -46,4 +49,13 @@
 }
 .controller__btn:active{
   background: rgb(0, 109, 0);
+}
+.error-box, .message {
+  text-align: center;
+  padding: 10px;
+  font-size: 20px;
+  color: rgba(0,0,0,.7);
+}
+.error-box {
+  color: red;
 }

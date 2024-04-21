@@ -13,8 +13,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
+// import { mkConfig, generateCsv, asString } from "export-to-csv";
+const csv_writer_1 = require("csv-writer");
 const path_1 = __importDefault(require("path"));
 const services_1 = __importDefault(require("./services"));
+// const csvConfig = mkConfig({ useKeysAsHeaders: true });
+try {
+    require('electron-reloader')(module);
+}
+catch (_) { }
 const createWindow = () => {
     const win = new electron_1.BrowserWindow({
         width: 1000,
@@ -26,6 +33,7 @@ const createWindow = () => {
     });
     win.loadFile(path_1.default.join(__dirname, '..', 'index.html'));
     win.webContents.openDevTools();
+    // FETCH TOKEN
     electron_1.ipcMain.on('fetch-token', (event, args) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const { username, password } = args;
@@ -42,6 +50,7 @@ const createWindow = () => {
             });
         }
     }));
+    // FETCH DATA
     electron_1.ipcMain.on('fetch-data', (event, args) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const { token } = args;
@@ -49,6 +58,39 @@ const createWindow = () => {
             event.reply('fetch-data-response', {
                 status: 200,
                 result: response
+            });
+        }
+        catch (error) {
+            event.reply('fetch-data-error', {
+                status: 500,
+                message: error.message
+            });
+        }
+    }));
+    // EXPORT
+    electron_1.ipcMain.on('export-data', (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const { data } = args;
+            const dataToCSV = [];
+            data.forEach((item) => dataToCSV.concat(item));
+            const header = [
+                {
+                    id: 'article',
+                    title: 'article'
+                },
+                {
+                    id: 'brand',
+                    title: 'brand'
+                }
+            ];
+            const writer = (0, csv_writer_1.createObjectCsvWriter)({
+                path: path_1.default.resolve(__dirname, 'products.csv'),
+                header,
+            });
+            yield writer.writeRecords(dataToCSV);
+            event.reply('export-data-response', {
+                status: 200,
+                message: 'Данные экспортированы!'
             });
         }
         catch (error) {

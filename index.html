@@ -2,26 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <title>Приложение</title>
 </head>
 <body>
   <div class="container">
-    <form action="" name="login-form" class="form hidden">
+    <form action="" name="login-form" class="form">
       <h2>Вход</h2>
-      <input type="text" name="login" placeholder="Пользователь" class="form__input">
-      <input type="password" name="password" placeholder="Пароль" class="form__input">
+      <input type="text" name="login" placeholder="Пользователь" class="form__input" value="TS00002225">
+      <input type="password" name="password" placeholder="Пароль" class="form__input" value="6OXyruVGkA">
       <button type="submit" class="form__submit">Войти</button>
     </form>
-    <div class="controller">
+    <div class="controller hidden">
       <button id="change-login" class="controller__btn">Сменить логин</button>
       <button id="fetch-data" class="controller__btn">Загрузить данные</button>
+      <button id="export" class="controller__btn hidden">Экпортировать в файл</button>
     </div>
     <div class="error-box"></div>
-  </div>
-  <div class="message">
-    
+    <div class="message"></div>
   </div>
   <script src="build/main.js"></script>
 </body>
