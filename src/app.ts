@@ -1,16 +1,14 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 // import { mkConfig, generateCsv, asString } from "export-to-csv";
 import { createObjectCsvWriter } from 'csv-writer';
-import dotenv from 'dotenv'
 import path from 'path'
-import fs from 'fs';
 import APISerives from './services';
 import { IProduct } from './types';
-import { writeFile } from "node:fs";
-import { Buffer } from "node:buffer";
-let cred:any = ""
 
-// const csvConfig = mkConfig({ useKeysAsHeaders: true });
+interface IHeader {
+  id: string,
+  title: string
+}
 try {
   require('electron-reloader')(module)
 } catch (_) {}
@@ -61,21 +59,21 @@ const createWindow = () => {
   // EXPORT
   ipcMain.on('export-data', async (event, args) => {
     try {
-      const { data } = args as { data: [IProduct[]]};
+      const { data } = args as { data: IProduct[]};
       const dataToCSV:IProduct[] = []
-      data.forEach((item) => dataToCSV.concat(item))
-      const header = [
-        {
-          id: 'article',
-          title: 'article'
-        },
-        {
-          id: 'brand',
-          title: 'brand'
-        }
-      ];
+      data.forEach((item, index) => {
+        dataToCSV.push(item as IProduct)
+      })
+      let header:IHeader[] = [];
+      const keys = Object.keys(dataToCSV[0])
+      for (let key of keys) {
+        header.push({
+          id: key,
+          title: key,
+        })
+      }
       const writer = createObjectCsvWriter({
-        path: path.resolve(__dirname, 'products.csv'),
+        path: path.resolve(__dirname, '..', `products-${Date.now()}.csv`),
         header, 
       })
       await writer.writeRecords(dataToCSV)

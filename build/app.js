@@ -17,8 +17,6 @@ const electron_1 = require("electron");
 const csv_writer_1 = require("csv-writer");
 const path_1 = __importDefault(require("path"));
 const services_1 = __importDefault(require("./services"));
-let cred = "";
-// const csvConfig = mkConfig({ useKeysAsHeaders: true });
 try {
     require('electron-reloader')(module);
 }
@@ -73,19 +71,19 @@ const createWindow = () => {
         try {
             const { data } = args;
             const dataToCSV = [];
-            data.forEach((item) => dataToCSV.concat(item));
-            const header = [
-                {
-                    id: 'article',
-                    title: 'article'
-                },
-                {
-                    id: 'brand',
-                    title: 'brand'
-                }
-            ];
+            data.forEach((item, index) => {
+                dataToCSV.push(item);
+            });
+            let header = [];
+            const keys = Object.keys(dataToCSV[0]);
+            for (let key of keys) {
+                header.push({
+                    id: key,
+                    title: key,
+                });
+            }
             const writer = (0, csv_writer_1.createObjectCsvWriter)({
-                path: path_1.default.resolve(__dirname, 'products.csv'),
+                path: path_1.default.resolve(__dirname, '..', `products-${Date.now()}.csv`),
                 header,
             });
             yield writer.writeRecords(dataToCSV);
