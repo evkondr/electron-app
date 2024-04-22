@@ -17,6 +17,7 @@ const electron_1 = require("electron");
 const csv_writer_1 = require("csv-writer");
 const path_1 = __importDefault(require("path"));
 const services_1 = __importDefault(require("./services"));
+let cred = "";
 // const csvConfig = mkConfig({ useKeysAsHeaders: true });
 try {
     require('electron-reloader')(module);
@@ -27,8 +28,8 @@ const createWindow = () => {
         width: 1000,
         height: 1000,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
+            preload: path_1.default.join(__dirname, 'preload.js'),
+            contextIsolation: true
         },
     });
     win.loadFile(path_1.default.join(__dirname, '..', 'index.html'));

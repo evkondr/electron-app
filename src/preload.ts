@@ -10,5 +10,5 @@ contextBridge.exposeInMainWorld('process', {
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   send: (channel:string, data:any) => ipcRenderer.send(channel, data),
-  on: (channel:string, callback:any) => ipcRenderer.on(channel, (event, ...args) => callback(...args))
+  on: (channel:string, callback:any) => ipcRenderer.on(channel, (event, ...args) => callback(channel,...args))
 })

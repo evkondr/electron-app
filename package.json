@@ -5,12 +5,14 @@
   "main": "build/app.js",
   "scripts": {
     "compile": "tsc --watch",
-    "start": "concurrently \"npm run compile\" \"electron ./build/app.js\""
+    "start": "concurrently \"npm run compile\" \"electron ./build/app.js\"",
+    "app": "electron ./build/app.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.12.7",
+    "dotenv": "^16.4.5",
     "electron": "30.0.0",
     "electron-reloader": "^1.2.3",
     "ts-node": "^10.9.2",
@@ -21,6 +23,7 @@
     "axios": "^1.6.8",
     "concurrently": "^8.2.2",
     "csv-writer": "^1.6.0",
-    "export-to-csv": "^1.2.4"
+    "export-to-csv": "^1.2.4",
+    "uninstall": "^0.0.0"
   }
 }

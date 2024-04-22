@@ -8,5 +8,5 @@ electron_1.contextBridge.exposeInMainWorld('process', {
 });
 electron_1.contextBridge.exposeInMainWorld('ipcRenderer', {
     send: (channel, data) => electron_1.ipcRenderer.send(channel, data),
-    on: (channel, callback) => electron_1.ipcRenderer.on(channel, (event, ...args) => callback(...args))
+    on: (channel, callback) => electron_1.ipcRenderer.on(channel, (event, ...args) => callback(channel, ...args))
 });

@@ -1,14 +1,16 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 // import { mkConfig, generateCsv, asString } from "export-to-csv";
 import { createObjectCsvWriter } from 'csv-writer';
+import dotenv from 'dotenv'
 import path from 'path'
+import fs from 'fs';
 import APISerives from './services';
 import { IProduct } from './types';
 import { writeFile } from "node:fs";
 import { Buffer } from "node:buffer";
+let cred:any = ""
 
 // const csvConfig = mkConfig({ useKeysAsHeaders: true });
-
 try {
   require('electron-reloader')(module)
 } catch (_) {}
@@ -18,8 +20,8 @@ const createWindow = () => {
     width: 1000,
     height: 1000,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true
     },
   })
   win.loadFile(path.join(__dirname, '..', 'index.html'))
