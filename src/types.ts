@@ -4,20 +4,15 @@ export interface IProduct {
   category: string;
   class: string;
   description: string;
-  images: any[];
+  images: string;
   img: string;
   name: string;
   oem: string[];
   price: string;
   productArticle: string;
-  props: {
-    "Бренд": string;
-    "Производитель техники": string;
-    size: null;
-    color: null;
-    euSize: null;
-  };
+  props: string;
   rPrice: string;
   stockCount: number;
   subCategory: string;
+  waits: string
 }

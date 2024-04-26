@@ -1,10 +1,29 @@
-button {
-  cursor: pointer;
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  width: 500;
+  height: 500;
 }
-.container {
-  width: 500px;
-  height: 500px;
-  overflow: scroll;
+.btn {
+  text-transform: uppercase;
+  cursor: pointer;
+  background: rgb(47, 47, 47);
+}
+.btn:hover {
+  background: rgb(59, 59, 59);
+}
+.btn:active {
+  background: rgb(47, 47, 47);
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.container{
+  width: 70%;
 }
 .form{
   display: flex;
@@ -17,17 +36,12 @@ button {
   background: none;
   padding: 10px;
   font-size: 20px;
-  border: 1px solid rgba(0,0,0,.5);
 }
 .form__submit {
-  background: rgb(8, 150, 8);
   padding: 10px;
   font-size: 20px;
   border: none;
   color: #fff;
-}
-.form__submit:active{
-  background: rgb(0, 109, 0);
 }
 .hidden{
   display: none!important;
@@ -41,14 +55,11 @@ button {
   row-gap: 10px;
 }
 .controller__btn {
-  background: rgb(8, 150, 8);
+  width: 100%;
   padding: 10px;
   font-size: 20px;
   border: none;
   color: #fff;
-}
-.controller__btn:active{
-  background: rgb(0, 109, 0);
 }
 .error-box, .message {
   text-align: center;

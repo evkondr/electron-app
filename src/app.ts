@@ -1,5 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-// import { mkConfig, generateCsv, asString } from "export-to-csv";
+import { AxiosError, isAxiosError } from 'axios';
+import { access, constants } from 'node:fs';
+import { mkdir } from 'fs/promises'
 import { createObjectCsvWriter } from 'csv-writer';
 import path from 'path'
 import APISerives from './services';
@@ -9,21 +11,23 @@ interface IHeader {
   id: string,
   title: string
 }
-try {
-  require('electron-reloader')(module)
-} catch (_) {}
-
+const isDev = process.env.NODE_ENV === 'development';
+console.log(process.env.NODE_ENV) 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 1000,
-    height: 1000,
+    width: isDev ? 1000 : 500,
+    height: 500,
+    resizable: isDev,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true
     },
+    autoHideMenuBar: true,
   })
+  if (isDev) {
+    win.webContents.openDevTools()
+  }
   win.loadFile(path.join(__dirname, '..', 'index.html'))
-  win.webContents.openDevTools()
   // FETCH TOKEN
   ipcMain.on('fetch-token', async (event, args) => {
     try {
@@ -33,11 +37,22 @@ const createWindow = () => {
         status: 200,
         result: response
        });
-    } catch (error:any) {
-      event.reply('fetch-data-error', {
-        status: 500,
-        message: error.message
-       });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        if(error.response?.status === 401) {
+          event.reply('fetch-data-error', {
+            message: 'Неверный пользователь или пароль'
+           });
+        } else {
+          event.reply('fetch-data-error', {
+            message: error.message
+           });
+        }
+      } else {
+        event.reply('fetch-data-error', {
+          message: "Неизвестная ошибка"
+         });
+      }
     }
  });
  // FETCH DATA
@@ -46,14 +61,18 @@ const createWindow = () => {
       const { token } = args;
       const response = await APISerives.fetchData(token)
       event.reply('fetch-data-response', {
-        status: 200,
         result: response
       });
     } catch (error:any) {
-      event.reply('fetch-data-error', {
-        status: 500,
-        message: error.message
-      });
+      if (isAxiosError(error)) {
+        event.reply('fetch-data-error', {
+          message: error.message
+         });
+      } else {
+        event.reply('fetch-data-error', {
+          message: "Неизвестная ошибка"
+         });
+      }
     }
   });
   // EXPORT
@@ -62,6 +81,9 @@ const createWindow = () => {
       const { data } = args as { data: IProduct[]};
       const dataToCSV:IProduct[] = []
       data.forEach((item, index) => {
+        item.props = JSON.stringify(item.props)
+        item.waits = JSON.stringify(item.waits)
+        item.images = JSON.stringify(item.images)
         dataToCSV.push(item as IProduct)
       })
       let header:IHeader[] = [];
@@ -72,15 +94,20 @@ const createWindow = () => {
           title: key,
         })
       }
-      const writer = createObjectCsvWriter({
-        path: path.resolve(__dirname, '..', `products-${Date.now()}.csv`),
-        header, 
-      })
-      await writer.writeRecords(dataToCSV)
-      event.reply('export-data-response', {
-        status: 200,
-        message: 'Данные экспортированы!'
-      })
+      access(path.join(__dirname, '..', 'csv'), constants.R_OK | constants.W_OK, async (err) => {
+        if (err) {
+          await mkdir(path.join(__dirname, '..', 'csv'))
+        }
+        const writer = createObjectCsvWriter({
+          path: path.resolve(__dirname, '..', 'csv', `products-${Date.now()}.csv`),
+          header, 
+        })
+        await writer.writeRecords(dataToCSV)
+        event.reply('export-data-response', {
+          status: 200,
+          message: 'Данные экспортированы!'
+        })
+      }); 
     } catch (error:any) {
       event.reply('fetch-data-error', {
         status: 500,

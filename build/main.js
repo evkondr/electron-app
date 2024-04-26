@@ -70,5 +70,6 @@ ipcRenderer.on('export-data-response', (event, data) => {
 });
 // @ts-expect-error
 ipcRenderer.on('fetch-data-error', (event, data) => {
+    clearMessages();
     errorBox.innerText = data.message;
 });

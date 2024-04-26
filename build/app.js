@@ -13,27 +13,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
-// import { mkConfig, generateCsv, asString } from "export-to-csv";
+const axios_1 = require("axios");
+const node_fs_1 = require("node:fs");
+const promises_1 = require("fs/promises");
 const csv_writer_1 = require("csv-writer");
 const path_1 = __importDefault(require("path"));
 const services_1 = __importDefault(require("./services"));
-try {
-    require('electron-reloader')(module);
-}
-catch (_) { }
+const isDev = process.env.NODE_ENV === 'development';
+console.log(process.env.NODE_ENV);
 const createWindow = () => {
     const win = new electron_1.BrowserWindow({
-        width: 1000,
-        height: 1000,
+        width: isDev ? 1000 : 500,
+        height: 500,
+        resizable: isDev,
         webPreferences: {
             preload: path_1.default.join(__dirname, 'preload.js'),
             contextIsolation: true
         },
+        autoHideMenuBar: true,
     });
+    if (isDev) {
+        win.webContents.openDevTools();
+    }
     win.loadFile(path_1.default.join(__dirname, '..', 'index.html'));
-    win.webContents.openDevTools();
     // FETCH TOKEN
     electron_1.ipcMain.on('fetch-token', (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
         try {
             const { username, password } = args;
             const response = yield services_1.default.login(username, password);
@@ -43,10 +48,23 @@ const createWindow = () => {
             });
         }
         catch (error) {
-            event.reply('fetch-data-error', {
-                status: 500,
-                message: error.message
-            });
+            if ((0, axios_1.isAxiosError)(error)) {
+                if (((_a = error.response) === null || _a === void 0 ? void 0 : _a.status) === 401) {
+                    event.reply('fetch-data-error', {
+                        message: 'Неверный пользователь или пароль'
+                    });
+                }
+                else {
+                    event.reply('fetch-data-error', {
+                        message: error.message
+                    });
+                }
+            }
+            else {
+                event.reply('fetch-data-error', {
+                    message: "Неизвестная ошибка"
+                });
+            }
         }
     }));
     // FETCH DATA
@@ -55,15 +73,20 @@ const createWindow = () => {
             const { token } = args;
             const response = yield services_1.default.fetchData(token);
             event.reply('fetch-data-response', {
-                status: 200,
                 result: response
             });
         }
         catch (error) {
-            event.reply('fetch-data-error', {
-                status: 500,
-                message: error.message
-            });
+            if ((0, axios_1.isAxiosError)(error)) {
+                event.reply('fetch-data-error', {
+                    message: error.message
+                });
+            }
+            else {
+                event.reply('fetch-data-error', {
+                    message: "Неизвестная ошибка"
+                });
+            }
         }
     }));
     // EXPORT
@@ -72,6 +95,9 @@ const createWindow = () => {
             const { data } = args;
             const dataToCSV = [];
             data.forEach((item, index) => {
+                item.props = JSON.stringify(item.props);
+                item.waits = JSON.stringify(item.waits);
+                item.images = JSON.stringify(item.images);
                 dataToCSV.push(item);
             });
             let header = [];
@@ -82,15 +108,20 @@ const createWindow = () => {
                     title: key,
                 });
             }
-            const writer = (0, csv_writer_1.createObjectCsvWriter)({
-                path: path_1.default.resolve(__dirname, '..', `products-${Date.now()}.csv`),
-                header,
-            });
-            yield writer.writeRecords(dataToCSV);
-            event.reply('export-data-response', {
-                status: 200,
-                message: 'Данные экспортированы!'
-            });
+            (0, node_fs_1.access)(path_1.default.join(__dirname, '..', 'csv'), node_fs_1.constants.R_OK | node_fs_1.constants.W_OK, (err) => __awaiter(void 0, void 0, void 0, function* () {
+                if (err) {
+                    yield (0, promises_1.mkdir)(path_1.default.join(__dirname, '..', 'csv'));
+                }
+                const writer = (0, csv_writer_1.createObjectCsvWriter)({
+                    path: path_1.default.resolve(__dirname, '..', 'csv', `products-${Date.now()}.csv`),
+                    header,
+                });
+                yield writer.writeRecords(dataToCSV);
+                event.reply('export-data-response', {
+                    status: 200,
+                    message: 'Данные экспортированы!'
+                });
+            }));
         }
         catch (error) {
             event.reply('fetch-data-error', {

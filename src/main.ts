@@ -39,7 +39,7 @@ submit?.addEventListener('click', (e) => {
 
 changeLoginBtn.addEventListener('click', (e) => {
   e.preventDefault();
-  logOut()
+  logOut();
 });
 fetchDataBtn.addEventListener('click', (e) => {
   e.preventDefault();
@@ -51,26 +51,27 @@ exportBtn.addEventListener('click', (e) => {
   e.preventDefault();
   // @ts-expect-error
   ipcRenderer.send('export-data', { data: fetchedData });
-  messageBox.innerText = 'Выполняется экспорт данных. Ожидайте...'
+  messageBox.innerText = 'Выполняется экспорт данных. Ожидайте...';
 })
 //Emmiters
 // @ts-expect-error
 ipcRenderer.on('fetch-token-response', (event, data) => {
-  token = data.result.token
-  form?.classList.toggle('hidden')
-  controllerBox.classList.toggle('hidden')
+  token = data.result.token;
+  form?.classList.toggle('hidden');
+  controllerBox.classList.toggle('hidden');
 });
 // @ts-expect-error
 ipcRenderer.on('fetch-data-response', (event, data) => {
-  messageBox.innerText = 'Загрузка данных завершена'
-  fetchedData = [...data.result.products]
-  exportBtn.classList.remove('hidden')
+  messageBox.innerText = 'Загрузка данных завершена';
+  fetchedData = [...data.result.products];
+  exportBtn.classList.remove('hidden');
 });
 // @ts-expect-error
 ipcRenderer.on('export-data-response', (event, data) => {
-  messageBox.innerText = data.message
+  messageBox.innerText = data.message;
 });
 // @ts-expect-error
 ipcRenderer.on('fetch-data-error', (event, data) => {
-  errorBox.innerText = data.message
+  clearMessages();
+  errorBox.innerText = data.message;
 });
