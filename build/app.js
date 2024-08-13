@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
+const exceljs_1 = __importDefault(require("exceljs"));
 const axios_1 = require("axios");
 const node_fs_1 = require("node:fs");
 const promises_1 = require("fs/promises");
-const csv_writer_1 = require("csv-writer");
 const path_1 = __importDefault(require("path"));
 const services_1 = __importDefault(require("./services"));
 const isDev = process.env.NODE_ENV === 'development';
@@ -92,6 +92,8 @@ const createWindow = () => {
     // EXPORT
     electron_1.ipcMain.on('export-data', (event, args) => __awaiter(void 0, void 0, void 0, function* () {
         try {
+            const workbook = new exceljs_1.default.Workbook();
+            const worksheet = workbook.addWorksheet('Products');
             const { data } = args;
             const dataToCSV = [];
             data.forEach((item, index) => {
@@ -100,23 +102,28 @@ const createWindow = () => {
                 item.images = JSON.stringify(item.images);
                 dataToCSV.push(item);
             });
-            let header = [];
+            // let header:IHeader[]
+            let columns = [];
             const keys = Object.keys(dataToCSV[0]);
             for (let key of keys) {
-                header.push({
-                    id: key,
-                    title: key,
+                columns.push({
+                    header: key,
+                    key: key,
+                    width: 20
                 });
             }
-            (0, node_fs_1.access)(path_1.default.join(__dirname, '..', 'csv'), node_fs_1.constants.R_OK | node_fs_1.constants.W_OK, (err) => __awaiter(void 0, void 0, void 0, function* () {
+            worksheet.columns = columns;
+            worksheet.addRows(dataToCSV);
+            (0, node_fs_1.access)(path_1.default.join(__dirname, '..', 'xlsx'), node_fs_1.constants.R_OK | node_fs_1.constants.W_OK, (err) => __awaiter(void 0, void 0, void 0, function* () {
                 if (err) {
-                    yield (0, promises_1.mkdir)(path_1.default.join(__dirname, '..', 'csv'));
+                    yield (0, promises_1.mkdir)(path_1.default.join(__dirname, '..', 'xlsx'));
                 }
-                const writer = (0, csv_writer_1.createObjectCsvWriter)({
-                    path: path_1.default.resolve(__dirname, '..', 'csv', `products-${Date.now()}.csv`),
-                    header,
-                });
-                yield writer.writeRecords(dataToCSV);
+                // const writer = createObjectCsvWriter({
+                //   path: path.resolve(__dirname, '..', 'csv', `products-${Date.now()}.csv`),
+                //   header, 
+                // })
+                // await writer.writeRecords(dataToCSV)
+                yield workbook.xlsx.writeFile(path_1.default.resolve(__dirname, '..', 'xlsx', `products-${Date.now()}.xlsx`));
                 event.reply('export-data-response', {
                     status: 200,
                     message: 'Данные экспортированы!'

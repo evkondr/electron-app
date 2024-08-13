@@ -27,6 +27,7 @@
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "csv-writer": "^1.6.0",
+    "exceljs": "^4.4.0",
     "export-to-csv": "^1.2.4",
     "uninstall": "^0.0.0"
   }

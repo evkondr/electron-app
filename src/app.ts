@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
+import excelJS from 'exceljs';
 import { AxiosError, isAxiosError } from 'axios';
 import { access, constants } from 'node:fs';
 import { mkdir } from 'fs/promises'
@@ -78,6 +79,8 @@ const createWindow = () => {
   // EXPORT
   ipcMain.on('export-data', async (event, args) => {
     try {
+      const workbook = new excelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Products'); 
       const { data } = args as { data: IProduct[]};
       const dataToCSV:IProduct[] = []
       data.forEach((item, index) => {
@@ -86,23 +89,28 @@ const createWindow = () => {
         item.images = JSON.stringify(item.images)
         dataToCSV.push(item as IProduct)
       })
-      let header:IHeader[] = [];
+      // let header:IHeader[]
+      let columns = []; 
       const keys = Object.keys(dataToCSV[0])
       for (let key of keys) {
-        header.push({
-          id: key,
-          title: key,
+        columns.push({
+          header: key,
+          key: key,
+          width: 20
         })
       }
-      access(path.join(__dirname, '..', 'csv'), constants.R_OK | constants.W_OK, async (err) => {
+      worksheet.columns = columns;
+      worksheet.addRows(dataToCSV);
+      access(path.join(__dirname, '..', 'xlsx'), constants.R_OK | constants.W_OK, async (err) => {
         if (err) {
-          await mkdir(path.join(__dirname, '..', 'csv'))
+          await mkdir(path.join(__dirname, '..', 'xlsx'))
         }
-        const writer = createObjectCsvWriter({
-          path: path.resolve(__dirname, '..', 'csv', `products-${Date.now()}.csv`),
-          header, 
-        })
-        await writer.writeRecords(dataToCSV)
+        // const writer = createObjectCsvWriter({
+        //   path: path.resolve(__dirname, '..', 'csv', `products-${Date.now()}.csv`),
+        //   header, 
+        // })
+        // await writer.writeRecords(dataToCSV)
+        await workbook.xlsx.writeFile(path.resolve(__dirname, '..', 'xlsx', `products-${Date.now()}.xlsx`))
         event.reply('export-data-response', {
           status: 200,
           message: 'Данные экспортированы!'
