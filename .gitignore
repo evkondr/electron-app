@@ -1,4 +1,6 @@
 node_modules
 temp.txt
 xlsx
-.env  
+.env
+product*
+release*

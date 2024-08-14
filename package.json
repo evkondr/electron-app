@@ -8,7 +8,9 @@
     "compile": "tsc --watch",
     "start": "cross-env NODE_ENV=development concurrently \"npm run compile\" \"npx electronmon ./build/app.js\"",
     "app": "tsc && electron ./build/app.js",
-    "build": "cross-env NODE_ENV=production tsc"
+    "build": "cross-env NODE_ENV=production tsc",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --prune=true --out=release-builds",
+    "package": "electron-builder build"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +19,7 @@
     "@types/node": "^20.12.7",
     "dotenv": "^16.4.5",
     "electron": "30.0.0",
+    "electron-builder": "^24.13.3",
     "electron-reloader": "^1.2.3",
     "ts-node": "^10.9.2",
     "tslib": "^2.6.2",
